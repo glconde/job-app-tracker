@@ -12,98 +12,137 @@ import { JobApplicationFormModel } from '../../../core/models/job-application-fo
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <h2>My Applications</h2>
-
-    <h3>{{ editingId === null ? 'Add Application' : 'Edit Application' }}</h3>
-
-    <form (ngSubmit)="saveApplication()">
-      <div>
-        <input
-          type="text"
-          placeholder="Company"
-          [(ngModel)]="formModel.companyName"
-          name="companyName"
-          required
-        />
+    <div class="page-header">
+      <h1>Job Application Tracker</h1>
+      <!-- Summary cards -->
+      <div class="summary">
+        <div class="summary-card">Applied: {{ countByStatus(ApplicationStatus.Applied) }}</div>
+        <div class="summary-card">Interview: {{ countByStatus(ApplicationStatus.Interview) }}</div>
+        <div class="summary-card">Offer: {{ countByStatus(ApplicationStatus.Offer) }}</div>
+        <div class="summary-card">Rejected: {{ countByStatus(ApplicationStatus.Rejected) }}</div>
       </div>
 
-      <div>
-        <input
-          type="text"
-          placeholder="Job Title"
-          [(ngModel)]="formModel.jobTitle"
-          name="jobTitle"
-          required
-        />
-      </div>
+      <!-- Form -->
+      <section class="form-section">
+        <h2>{{ editingId === null ? 'Add Application' : 'Edit Application' }}</h2>
 
-      <div>
-        <select [(ngModel)]="formModel.status" name="status">
-          <option *ngFor="let s of statusOptions" [value]="s">
-            {{ s }}
-          </option>
-        </select>
-      </div>
+        <form (ngSubmit)="saveApplication()">
+          <div>
+            <input
+              type="text"
+              placeholder="Company"
+              [(ngModel)]="formModel.companyName"
+              name="companyName"
+              required
+            />
+          </div>
 
-      <div>
-        <input type="date" [(ngModel)]="formModel.dateApplied" name="dateApplied" required />
-      </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Job Title"
+              [(ngModel)]="formModel.jobTitle"
+              name="jobTitle"
+              required
+            />
+          </div>
 
-      <div>
-        <input type="url" placeholder="Job URL" [(ngModel)]="formModel.jobUrl" name="jobUrl" />
-      </div>
+          <div>
+            <select [(ngModel)]="formModel.status" name="status">
+              <option *ngFor="let s of statusOptions" [value]="s">
+                {{ s }}
+              </option>
+            </select>
+          </div>
 
-      <div>
-        <input
-          type="text"
-          placeholder="Location"
-          [(ngModel)]="formModel.location"
-          name="location"
-        />
-      </div>
+          <div>
+            <input type="date" [(ngModel)]="formModel.dateApplied" name="dateApplied" required />
+          </div>
 
-      <div>
-        <textarea
-          placeholder="Notes"
-          [(ngModel)]="formModel.notes"
-          name="notes"
-          rows="3"
-        ></textarea>
-      </div>
+          <div>
+            <input type="url" placeholder="Job URL" [(ngModel)]="formModel.jobUrl" name="jobUrl" />
+          </div>
 
-      <button type="submit" [disabled]="loading">
-        {{ editingId === null ? 'Add Application' : 'Save Changes' }}
-      </button>
+          <div>
+            <input
+              type="text"
+              placeholder="Location"
+              [(ngModel)]="formModel.location"
+              name="location"
+            />
+          </div>
 
-      <button *ngIf="editingId !== null" type="button" (click)="cancelEdit()" [disabled]="loading">
-        Cancel
-      </button>
-    </form>
+          <div>
+            <textarea
+              placeholder="Notes"
+              [(ngModel)]="formModel.notes"
+              name="notes"
+              rows="3"
+            ></textarea>
+          </div>
 
-    <div *ngIf="loading">Loading...</div>
-
-    <div *ngIf="error" class="error">{{ error }}</div>
-
-    <div *ngIf="!loading && !error">
-      <div *ngIf="applications.length === 0" class="empty-state">No job applications found.</div>
-
-      <ul *ngIf="applications.length > 0">
-        <li *ngFor="let app of applications; trackBy: trackById">
-          <strong>{{ app.companyName }}</strong>
-          — {{ app.jobTitle }} ({{ app.status }})
-
-          <button type="button" (click)="editApplication(app)" [disabled]="editingId !== null">
-            Edit
+          <button type="submit" [disabled]="loading">
+            {{ editingId === null ? 'Add Application' : 'Save Changes' }}
           </button>
-          <button type="button" (click)="deleteApplication(app.id)" [disabled]="editingId !== null">
-            Delete
+
+          <button
+            *ngIf="editingId !== null"
+            type="button"
+            (click)="cancelEdit()"
+            [disabled]="loading"
+          >
+            Cancel
           </button>
-        </li>
-      </ul>
+        </form>
+      </section>
+
+      <!-- Application list -->
+      <section class="list-section">
+        <h2>My Applications</h2>
+        <div *ngIf="loading">Loading...</div>
+        <div *ngIf="!loading && !error">
+          <div *ngIf="applications.length === 0" class="empty-state">
+            No job applications found.
+          </div>
+          <table *ngIf="applications.length > 0">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Job Title</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let app of applications; trackBy: trackById">
+                <td>{{ app.companyName }}</td>
+                <td>{{ app.jobTitle }}</td>
+                <td>{{ app.status }}</td>
+                <td>{{ app.dateApplied | date }}</td>
+                <td>{{ app.location }}</td>
+
+                <td>
+                  <button (click)="editApplication(app)" [disabled]="editingId !== null">
+                    Edit
+                  </button>
+
+                  <button (click)="deleteApplication(app.id)" [disabled]="editingId !== null">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   `,
 })
 export class JobApplicationsPageComponent implements OnInit {
+  ApplicationStatus = ApplicationStatus;
   private service = inject(JobApplicationService);
   applications: JobApplication[] = [];
   loading = false;
@@ -246,5 +285,9 @@ export class JobApplicationsPageComponent implements OnInit {
         },
       });
     }
+  }
+
+  countByStatus(status: ApplicationStatus): number {
+    return this.applications.filter((a) => a.status === status).length;
   }
 }
