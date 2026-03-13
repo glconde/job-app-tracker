@@ -166,7 +166,7 @@ export class JobApplicationsPageComponent implements OnInit {
       return;
     }
 
-    if (this.editingId !== null && this.editingCreatedAt === null) {
+    if (this.editingCreatedAt === null) {
       this.error = 'Missing original application metadata.';
       this.loading = false;
       return;
