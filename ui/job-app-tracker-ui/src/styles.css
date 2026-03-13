@@ -60,3 +60,35 @@ th {
   text-align: left;
   background: #f4f6f8;
 }
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-interested {
+  background: #f3f4f6;
+}
+
+.status-applied {
+  background: #e5e7eb;
+}
+
+.status-interviewing {
+  background: #dbeafe;
+}
+
+.status-offer {
+  background: #dcfce7;
+}
+
+.status-rejected {
+  background: #fee2e2;
+}
+
+.status-archived {
+  background: #f1f5f9;
+}

@@ -106,6 +106,16 @@ import { JobApplicationFormModel } from '../../../core/models/job-application-fo
           <div *ngIf="applications.length === 0" class="empty-state">
             No job applications found.
           </div>
+          <input
+            type="text"
+            placeholder="Search company or job title"
+            [(ngModel)]="searchTerm"
+            name="searchTerm"
+          />
+          <select [(ngModel)]="selectedStatus" name="selectedStatus">
+            <option value="">All statuses</option>
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+          </select>
           <table *ngIf="applications.length > 0">
             <thead>
               <tr>
@@ -119,11 +129,15 @@ import { JobApplicationFormModel } from '../../../core/models/job-application-fo
             </thead>
 
             <tbody>
-              <tr *ngFor="let app of applications; trackBy: trackById">
+              <tr *ngFor="let app of filteredApplications; trackBy: trackById">
                 <td>{{ app.companyName }}</td>
                 <td>{{ app.jobTitle }}</td>
-                <td>{{ app.status }}</td>
-                <td>{{ app.dateApplied | date }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(app.status)">{{
+                    app.status
+                  }}</span>
+                </td>
+                <td>{{ app.dateApplied | date: 'mediumDate' }}</td>
                 <td>{{ app.location }}</td>
 
                 <td>
@@ -162,6 +176,8 @@ export class JobApplicationsPageComponent implements OnInit {
     notes: '',
   };
   formModel = { ...this.formInitialState };
+  searchTerm = '';
+  selectedStatus = '';
 
   loadApplications(): void {
     this.loading = true;
@@ -291,5 +307,35 @@ export class JobApplicationsPageComponent implements OnInit {
 
   countByStatus(status: ApplicationStatus): number {
     return this.applications.filter((a) => a.status === status).length;
+  }
+
+  getStatusClass(status: ApplicationStatus): string {
+    switch (status) {
+      case ApplicationStatus.Applied:
+        return 'status-applied';
+      case ApplicationStatus.Interviewing:
+        return 'status-interviewing';
+      case ApplicationStatus.Rejected:
+        return 'status-rejected';
+      case ApplicationStatus.Offer:
+        return 'status-offer';
+      case ApplicationStatus.Archived:
+        return 'status-archived';
+      default:
+        return 'status-interested';
+    }
+  }
+
+  get filteredApplications(): JobApplication[] {
+    const term = this.searchTerm.trim().toLowerCase();
+
+    return this.applications.filter((app) => {
+      const matchesStatus =
+        !term ||
+        app.companyName.toLowerCase().includes(term) ||
+        app.jobTitle.toLowerCase().includes(term);
+      const matchesSearch = !this.selectedStatus || app.status === this.selectedStatus;
+      return matchesStatus && matchesSearch;
+    });
   }
 }
