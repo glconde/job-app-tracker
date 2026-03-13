@@ -12,12 +12,14 @@ import { JobApplicationFormModel } from '../../../core/models/job-application-fo
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-header">
+    <div class="page-container">
       <h1>Job Application Tracker</h1>
       <!-- Summary cards -->
       <div class="summary">
         <div class="summary-card">Applied: {{ countByStatus(ApplicationStatus.Applied) }}</div>
-        <div class="summary-card">Interview: {{ countByStatus(ApplicationStatus.Interview) }}</div>
+        <div class="summary-card">
+          Interview: {{ countByStatus(ApplicationStatus.Interviewing) }}
+        </div>
         <div class="summary-card">Offer: {{ countByStatus(ApplicationStatus.Offer) }}</div>
         <div class="summary-card">Rejected: {{ countByStatus(ApplicationStatus.Rejected) }}</div>
       </div>
