@@ -104,12 +104,12 @@ http://localhost:4200
 ## Status Values
 
 The application currently supports the following statuses:
-- Interested
-- Applied
-- Interviewing
-- Offer
-- Rejected
-- Archived
+- Interested ⭐
+- Applied 📤
+- Interviewing 🗣️
+- Offer 💼
+- Rejected ❌
+- Archived 🗄️
 
 ## Current MVP Scope
 
