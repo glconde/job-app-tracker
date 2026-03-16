@@ -52,9 +52,22 @@ SQLite
 The frontend communicates with the backend through REST endpoints. The backend uses Entity Framework Core for data access and SQLite for lightweight local persistence.
 
 ## Screenshots
--todo
-### Dashboard
-### Add/Edit Form
+
+![Fresh Install](./docs/images/start-state.png)  
+*Fig 1.* Fresh installation state with no data.
+
+### Add/Edit Record
+![Form Interaction](./docs/images/add-edit.png)  
+*Fig 2.* Form used to add a new record or edit an existing application.
+
+### List
+![List](./docs/images/list.png)  
+*Fig 3.* "My Applications" view listing all saved job applications with management options.
+
+### Filters
+![Filters](./docs/images/filters.png)  
+*Fig 4.* List filtering by company, job title, and application status.
+
 
 ## Project Structure
 ```text
