@@ -1,8 +1,21 @@
-.page {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+.page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px;
   font-family: Arial, sans-serif;
+}
+
+.double-column {
+  display: grid;
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .double-column {
+    grid-template-columns: 1fr;
+  }
 }
 
 .summary {
@@ -20,20 +33,29 @@
   font-weight: bold;
 }
 
-.form-section {
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.form-section, .list-section {
   background: #fafafa;
-  padding: 16px;
-  border-radius: 6px;
+  padding: 20px;
+  border-radius: 8px;
   margin-bottom: 24px;
+}
+
+.list-section {
+  min-width: 0;
+  width: 100%;
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin-top: 6px;
   margin-bottom: 12px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 button {
@@ -42,17 +64,164 @@ button {
   cursor: pointer;
 }
 
+/* table styles */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}   
+
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+th,
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: top;
 }
 
 th {
-  text-align: left;
   background: #f4f6f8;
+}
+
+/* company */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 20%;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* job title */
+th:nth-child(2),
+td:nth-child(2) {
+  width: 24%;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* status - icon */
+th:nth-child(3),
+td:nth-child(3) {
+  width: 72px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* date */
+th:nth-child(4),
+td:nth-child(4) {
+  width: 130px;
+  white-space: nowrap;
+}
+
+td:last-child,
+th:last-child {
+  width: 120px;
+  white-space: nowrap;
+}
+
+
+
+
+
+/* status badges */
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-interested {
+  background: #f3f4f6;
+}
+
+.status-applied {
+  background: #e5e7eb;
+}
+
+.status-interviewing {
+  background: #dbeafe;
+}
+
+.status-offer {
+  background: #dcfce7;
+}
+
+.status-rejected {
+  background: #fee2e2;
+}
+
+.status-archived {
+  background: #f1f5f9;
+}
+
+/* filters */
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.filters input, .filters select {
+  margin: 0;
+}
+
+.filters input {
+  flex: 1;
+  min-width: 0;
+}
+
+.filters select {
+  width: 180px;
+}
+
+@media (max-width: 700px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters select {
+    width: 100%;
+  }
+}
+
+/* action buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.icon-btn:hover {
+  background: #f9fafb;
+}
+
+.icon-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -12,132 +12,210 @@ import { JobApplicationFormModel } from '../../../core/models/job-application-fo
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-header">
+    <div class="page-container">
       <h1>Job Application Tracker</h1>
       <!-- Summary cards -->
       <div class="summary">
-        <div class="summary-card">Applied: {{ countByStatus(ApplicationStatus.Applied) }}</div>
-        <div class="summary-card">Interview: {{ countByStatus(ApplicationStatus.Interview) }}</div>
-        <div class="summary-card">Offer: {{ countByStatus(ApplicationStatus.Offer) }}</div>
-        <div class="summary-card">Rejected: {{ countByStatus(ApplicationStatus.Rejected) }}</div>
+        <div class="summary-card">
+          <span class="legend-icon">{{ getStatusIcon(ApplicationStatus.Applied) }}</span
+          >Applied: {{ countByStatus(ApplicationStatus.Applied) }}
+        </div>
+        <div class="summary-card">
+          <span class="legend-icon">{{ getStatusIcon(ApplicationStatus.Interviewing) }}</span>
+          Interview: {{ countByStatus(ApplicationStatus.Interviewing) }}
+        </div>
+        <div class="summary-card">
+          <span class="legend-icon">{{ getStatusIcon(ApplicationStatus.Interested) }}</span>
+          Interested: {{ countByStatus(ApplicationStatus.Interested) }}
+        </div>
+        <div class="summary-card">
+          <span class="legend-icon">{{ getStatusIcon(ApplicationStatus.Offer) }}</span
+          >Offer: {{ countByStatus(ApplicationStatus.Offer) }}
+        </div>
+        <div class="summary-card">
+          <span class="legend-icon">{{ getStatusIcon(ApplicationStatus.Rejected) }}</span
+          >Rejected: {{ countByStatus(ApplicationStatus.Rejected) }}
+        </div>
+        <div class="summary-card">
+          <span class="legend-icon">{{ getStatusIcon(ApplicationStatus.Archived) }}</span
+          >Archived: {{ countByStatus(ApplicationStatus.Archived) }}
+        </div>
       </div>
 
-      <!-- Form -->
-      <section class="form-section">
-        <h2>{{ editingId === null ? 'Add Application' : 'Edit Application' }}</h2>
+      <!-- Two-column layout -->
+      <div class="double-column">
+        <!-- Form -->
+        <section class="form-section">
+          <h2>{{ editingId === null ? 'Add Application' : 'Edit Application' }}</h2>
 
-        <form (ngSubmit)="saveApplication()">
-          <div>
+          <form (ngSubmit)="saveApplication()">
+            <div>
+              <input
+                type="text"
+                placeholder="Company"
+                [(ngModel)]="formModel.companyName"
+                name="companyName"
+                required
+              />
+            </div>
+
+            <div>
+              <input
+                type="text"
+                placeholder="Job Title"
+                [(ngModel)]="formModel.jobTitle"
+                name="jobTitle"
+                required
+              />
+            </div>
+
+            <div>
+              <select [(ngModel)]="formModel.status" name="status">
+                @for (s of statusOptions; track s) {
+                  <option [value]="s">
+                    {{ s }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <input type="date" [(ngModel)]="formModel.dateApplied" name="dateApplied" required />
+            </div>
+
+            <div>
+              <input
+                type="url"
+                placeholder="Job URL"
+                [(ngModel)]="formModel.jobUrl"
+                name="jobUrl"
+              />
+            </div>
+
+            <div>
+              <input
+                type="text"
+                placeholder="Location"
+                [(ngModel)]="formModel.location"
+                name="location"
+              />
+            </div>
+
+            <div>
+              <textarea
+                placeholder="Notes"
+                [(ngModel)]="formModel.notes"
+                name="notes"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              [disabled]="loading"
+              class="icon-btn"
+              [title]="editingId === null ? 'Add Application' : 'Save Changes'"
+            >
+              {{ editingId === null ? '➕' : '💾' }}
+            </button>
+
+            @if (editingId !== null) {
+              <button
+                type="button"
+                (click)="cancelEdit()"
+                [disabled]="loading"
+                class="icon-btn"
+                title="Cancel"
+              >
+                ❌
+              </button>
+            }
+          </form>
+        </section>
+        <!-- Application list -->
+        <section class="list-section">
+          <h2>My Applications</h2>
+          <div class="filters">
             <input
               type="text"
-              placeholder="Company"
-              [(ngModel)]="formModel.companyName"
-              name="companyName"
-              required
+              placeholder="Search company or job title"
+              [(ngModel)]="searchTerm"
+              name="searchTerm"
             />
-          </div>
-
-          <div>
-            <input
-              type="text"
-              placeholder="Job Title"
-              [(ngModel)]="formModel.jobTitle"
-              name="jobTitle"
-              required
-            />
-          </div>
-
-          <div>
-            <select [(ngModel)]="formModel.status" name="status">
-              <option *ngFor="let s of statusOptions" [value]="s">
-                {{ s }}
-              </option>
+            <select [(ngModel)]="selectedStatus" name="selectedStatus">
+              <option value="">All statuses</option>
+              @for (s of statusOptions; track s) {
+                <option [value]="s">{{ s }}</option>
+              }
             </select>
           </div>
+          @if (loading) {
+            <div>Loading...</div>
+          } @else if (error) {
+            <div class="error">{{ error }}</div>
+          } @else if (filteredApplications.length === 0) {
+            <div class="empty-state">No job applications found.</div>
+          } @else {
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Company</th>
+                    <th>Job Title</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-          <div>
-            <input type="date" [(ngModel)]="formModel.dateApplied" name="dateApplied" required />
-          </div>
+                <tbody>
+                  @for (app of filteredApplications; track app.id) {
+                    <tr>
+                      <td>{{ app.companyName }}</td>
+                      <td>{{ app.jobTitle }}</td>
+                      <td>
+                        <span
+                          class="status-badge"
+                          [ngClass]="getStatusClass(app.status)"
+                          [title]="app.status"
+                        >
+                          {{ getStatusIcon(app.status) }}
+                        </span>
+                      </td>
+                      <td>{{ app.dateApplied | date: 'mediumDate' }}</td>
+                      <td>{{ app.location }}</td>
 
-          <div>
-            <input type="url" placeholder="Job URL" [(ngModel)]="formModel.jobUrl" name="jobUrl" />
-          </div>
-
-          <div>
-            <input
-              type="text"
-              placeholder="Location"
-              [(ngModel)]="formModel.location"
-              name="location"
-            />
-          </div>
-
-          <div>
-            <textarea
-              placeholder="Notes"
-              [(ngModel)]="formModel.notes"
-              name="notes"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <button type="submit" [disabled]="loading">
-            {{ editingId === null ? 'Add Application' : 'Save Changes' }}
-          </button>
-
-          <button
-            *ngIf="editingId !== null"
-            type="button"
-            (click)="cancelEdit()"
-            [disabled]="loading"
-          >
-            Cancel
-          </button>
-        </form>
-      </section>
-
-      <!-- Application list -->
-      <section class="list-section">
-        <h2>My Applications</h2>
-        <div *ngIf="loading">Loading...</div>
-        <div *ngIf="!loading && !error">
-          <div *ngIf="applications.length === 0" class="empty-state">
-            No job applications found.
-          </div>
-          <table *ngIf="applications.length > 0">
-            <thead>
-              <tr>
-                <th>Company</th>
-                <th>Job Title</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr *ngFor="let app of applications; trackBy: trackById">
-                <td>{{ app.companyName }}</td>
-                <td>{{ app.jobTitle }}</td>
-                <td>{{ app.status }}</td>
-                <td>{{ app.dateApplied | date }}</td>
-                <td>{{ app.location }}</td>
-
-                <td>
-                  <button (click)="editApplication(app)" [disabled]="editingId !== null">
-                    Edit
-                  </button>
-
-                  <button (click)="deleteApplication(app.id)" [disabled]="editingId !== null">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+                      <td>
+                        <div class="action-buttons">
+                          <button
+                            type="button"
+                            class="icon-btn"
+                            (click)="editApplication(app)"
+                            [disabled]="editingId !== null"
+                            title="Edit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            type="button"
+                            class="icon-btn"
+                            (click)="deleteApplication(app.id)"
+                            [disabled]="editingId !== null"
+                            title="Delete"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      </div>
     </div>
   `,
 })
@@ -160,6 +238,8 @@ export class JobApplicationsPageComponent implements OnInit {
     notes: '',
   };
   formModel = { ...this.formInitialState };
+  searchTerm = '';
+  selectedStatus = '';
 
   loadApplications(): void {
     this.loading = true;
@@ -289,5 +369,54 @@ export class JobApplicationsPageComponent implements OnInit {
 
   countByStatus(status: ApplicationStatus): number {
     return this.applications.filter((a) => a.status === status).length;
+  }
+
+  getStatusClass(status: ApplicationStatus): string {
+    switch (status) {
+      case ApplicationStatus.Applied:
+        return 'status-applied';
+      case ApplicationStatus.Interviewing:
+        return 'status-interviewing';
+      case ApplicationStatus.Rejected:
+        return 'status-rejected';
+      case ApplicationStatus.Offer:
+        return 'status-offer';
+      case ApplicationStatus.Archived:
+        return 'status-archived';
+      default:
+        return 'status-interested';
+    }
+  }
+
+  getStatusIcon(status: ApplicationStatus): string {
+    switch (status) {
+      case ApplicationStatus.Applied:
+        return '📤';
+      case ApplicationStatus.Interviewing:
+        return '🗣️';
+      case ApplicationStatus.Interested:
+        return '⭐';
+      case ApplicationStatus.Offer:
+        return '💼';
+      case ApplicationStatus.Rejected:
+        return '❌';
+      case ApplicationStatus.Archived:
+        return '🗄️';
+      default:
+        return '❓';
+    }
+  }
+
+  get filteredApplications(): JobApplication[] {
+    const term = this.searchTerm.trim().toLowerCase();
+
+    return this.applications.filter((app) => {
+      const matchesStatus =
+        !term ||
+        app.companyName.toLowerCase().includes(term) ||
+        app.jobTitle.toLowerCase().includes(term);
+      const matchesSearch = !this.selectedStatus || app.status === this.selectedStatus;
+      return matchesStatus && matchesSearch;
+    });
   }
 }
