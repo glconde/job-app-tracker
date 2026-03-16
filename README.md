@@ -21,6 +21,16 @@ A full-stack job application tracking app built with Angular and ASP.NET Core We
 - Template-driven forms
 - HttpClient
 
+#### *Dependency Security Update*
+Running `npm audit` currently reports <strong>high-severity vulnerabilities</strong> in the `undici` package, which is pulled in as a transitive dependency of Angular build tooling:
+```text
+@angular-devkit/build-angular → @angular/build → undici
+```
+
+These issues originate from the development toolchain and <strong>do not</strong> affect the runtime Angular applicaiton bundle.
+
+At the time of this configuration, the latest Angular 21 build packages available on npm still depend on a vulnerable `undici` range. Automatically applying `npm audit fix --force` would downgrade the Angular build tooling to a <strong>previous major version</strong>, which would break compatibility with Angular 21.
+
 ### Backend
 - ASP.NET Core Web API
 - C#
@@ -107,6 +117,7 @@ This project is currently at MVP stage and supports the core job application tra
 
 ## Future Improvements
 
+- Upgrade Angular build dependencies once patched versions resolve the `undici` transitive security advisories
 - Authentication and per-user data
 - Dashboard analytics and charts
 - Sorting and pagination
@@ -126,7 +137,9 @@ Calgary, AB
 [LinkedIn](https://linkedin.com/in/glconde)  
 [GitHub](https://github.com/glconde)
 
-## License
+## License & Version
 This project is licensed under the MIT License.
 See the LICENSE file for details.
 
+### Version
+0.1.0
