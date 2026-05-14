@@ -140,7 +140,17 @@ This project is currently at MVP stage and supports the core job application tra
 
 ## Why I Built This
 
-I built this project as a practical full-stack application using Angular and ASP.NET Core, while also solving a real workflow problem: keeping job applications organized in one place.
+I built this project as a practical full-stack exercise while refining Angular and ASP.NET Core development skills. It also addresses a real workflow problem: keeping job applications organized in one place.
+
+## Related Projects
+
+### Vue Frontend Migration
+
+A Vue 3 + TypeScript frontend migration of this project is being developed here:
+
+- [job-app-tracker-vue](https://github.com/glconde-labs/job-app-tracker-vue?utm_source=chatgpt.com)
+
+The Vue version retains the ASP.NET Core backend architecture and REST API workflow while rebuilding the frontend using Vue 3, Vite, and TypeScript as a framework migration and comparative frontend architecture exercise.
 
 ## 👤 Author
 
