@@ -148,7 +148,7 @@ I built this project as a practical full-stack exercise while refining Angular a
 
 A Vue 3 + TypeScript frontend migration of this project is being developed here:
 
-- [job-app-tracker-vue](https://github.com/glconde-labs/job-app-tracker-vue?utm_source=chatgpt.com)
+- [job-app-tracker-vue](https://github.com/glconde-labs/job-app-tracker-vue)
 
 The Vue version retains the ASP.NET Core backend architecture and REST API workflow while rebuilding the frontend using Vue 3, Vite, and TypeScript as a framework migration and comparative frontend architecture exercise.
 
